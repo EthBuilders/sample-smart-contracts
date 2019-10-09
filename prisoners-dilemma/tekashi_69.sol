@@ -6,33 +6,34 @@ pragma solidity ^0.5.1;
 contract Tekashi69_Dilemma {
     // the suspects' choices 
     // hack to name sure pending is 0 which is a default value
-    enum Choices { _AvoidZero, pending, silence, snitch }
+    enum Choice { NULL, PENDING, SILENCE, SNITCH }
     
     address suspect1;
     address suspect2;
     
     // doesn't have to specify where its use before the constructor
     // each suspect can make a choice
-    mapping(address => Choices) suspectChoice;
+    mapping(address => Choice) suspectChoices;
+
     constructor(address suspect1, address suspect2) public {
         suspect1 = suspect1;
         suspect2 = suspect2;
-        suspectChoice[suspect1] = Choices.pending;
-        suspectChoice[suspect2] = Choices.pending;
+        suspectChoices[suspect1] = Choice.PENDING;
+        suspectChoices[suspect2] = Choice.PENDING;
     }
 
     // the suspect makes a decision
-    function suspectDecision(Choices choice) public {
+    function suspectDecision(Choice choice) public {
         // suspects can only decide
         // you can still make a decsion
-        require(suspectChoice[msg.sender] == Choices.pending);
+        require(suspectChoices[msg.sender] == Choice.PENDING);
         require(isValid(choice));
 
         // make a choice!
-        suspectChoice[msg.sender] = choice;
+        suspectChoices[msg.sender] = choice;
         
         // prosecutor giggles and runs verdict()
-        verdict()
+        verdict();
     }
     
     // final deal
@@ -49,14 +50,14 @@ contract Tekashi69_Dilemma {
     }
     
     // domain driven design
-    function isValid(Choices choice) internal pure returns (bool) {
+    function isValid(Choice choice) internal pure returns (bool) {
         // prosecutor pressures you to make choice, 
         // can't choose pending to stall or Denial of service
-        return choice == Choices.silence || choice == Choices.snitch;
+        return choice == Choice.SILENCE || choice == Choice.SNITCH;
     }
     
-    function interrogated(address suspect) internal returns (bool) {
-        return isValid(suspectChoice[suspect]);
+    function interrogated(address suspect) internal view returns (bool) {
+        return isValid(suspectChoices[suspect]);
     }
     
 }
@@ -69,7 +70,7 @@ To improve:
 - add aztec protocol to hide decision, other guy could just see the decision.
 
 
-Its game.
+It's a game.
 
 two players -> two addresses
 
